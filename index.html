@@ -279,18 +279,40 @@
     </div>
     
     <script>
-        const downloadZipBtn = document.getElementById('download-zip-btn');
-        const zipStatus = document.getElementById('zip-status');
-        const LIMEWIRE_URL = 'https://limewire.com/?referrer=pq7i8xx7p2';
-        
-        downloadZipBtn.addEventListener('click', () => {
-            zipStatus.className = 'zip-status info';
-            zipStatus.textContent = 'Opening download page...';
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadZipBtn = document.getElementById('download-zip-btn');
+            const zipStatus = document.getElementById('zip-status');
+            const LIMEWIRE_URL = 'https://limewire.com/?referrer=pq7i8xx7p2';
             
-            // Open LimeWire in new tab for download
-            window.open(LIMEWIRE_URL, '_blank');
+            if (!downloadZipBtn) {
+                console.error('Download button not found!');
+                return;
+            }
             
-            zipStatus.textContent = '✓ Download page opened in new tab. Please follow the instructions on LimeWire to download the file.';
+            downloadZipBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                zipStatus.className = 'zip-status info';
+                zipStatus.textContent = 'Opening download page...';
+                
+                try {
+                    // Open LimeWire in new tab for download
+                    const newWindow = window.open(LIMEWIRE_URL, '_blank');
+                    
+                    if (!newWindow) {
+                        // Popup blocked
+                        zipStatus.className = 'zip-status error';
+                        zipStatus.textContent = '⚠️ Popup blocked! Please allow pop-ups for this site and try again.';
+                    } else {
+                        zipStatus.textContent = '✓ Download page opened in new tab. Please follow the instructions on LimeWire to download the file.';
+                    }
+                } catch (error) {
+                    console.error('Error opening download page:', error);
+                    zipStatus.className = 'zip-status error';
+                    zipStatus.textContent = 'Error: ' + error.message;
+                }
+            });
         });
     </script>
 </body>
